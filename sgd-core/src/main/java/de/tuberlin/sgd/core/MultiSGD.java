@@ -7,7 +7,7 @@ import java.util.concurrent.Executors;
 
 public class MultiSGD {
 
-    final static int numOfIteration = 10;
+    final static int numOfIteration = 100;
     private static volatile DVector[] params = new DVector[numOfIteration];
 
     public static void main(String[] args) {
@@ -30,13 +30,23 @@ public class MultiSGD {
 
             executorService.shutdown();
 
-            System.out.println(params[x].elements[0]);
+/*            System.out.println(params[x].elements[0]);
             System.out.println(params[x].elements[1]);
             System.out.println(params[x].elements[2]);
             System.out.println(params[x].elements[3]);
             System.out.println(params[x].elements[4]);
 
-            System.out.println();
+            System.out.println();*/
+        }
+
+        for (int y=0; y<numOfIteration; y++){
+            System.out.print("Delta of Iteration "+y+ " = ");
+            double delta = 0;
+            for(int h=0; h < params[y].elements.length - 1; h++){
+                delta = delta + (params[y].elements[h+1] - params[y].elements[h]);
+            }
+            System.out.println(delta);
+
         }
 
     }
