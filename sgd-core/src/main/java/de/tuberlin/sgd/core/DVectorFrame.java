@@ -2,7 +2,9 @@ package de.tuberlin.sgd.core;
 
 import com.google.common.base.Preconditions;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class DVectorFrame {
@@ -48,5 +50,41 @@ public class DVectorFrame {
 
     public int getNumberOfVecs() {
         return dVectors.length;
+    }
+
+
+
+    public List<DVectorFrame> split (int numberOfFrames, String[] fields){
+
+        List<DVectorFrame> splittedList = new ArrayList<DVectorFrame>();
+
+        int frameSize = dVectors[0].elements.length;
+        int counter = 0;
+        int step;
+
+        if (frameSize%numberOfFrames == 0)
+            step= frameSize/numberOfFrames;
+        else
+            step= frameSize/numberOfFrames + 1;
+
+        for (int i=0; i<numberOfFrames; i++){
+            DVectorFrame frame = new DVectorFrame(fields);
+
+            for (int j=0; j<frame.dVectors.length; j++){
+                if(frame.dVectors[j] == null){
+                    frame.dVectors[j] = new DVector(step);
+                }
+                try {
+                   System.arraycopy(this.dVectors[j].elements, counter, frame.dVectors[j].elements,0,step);
+
+                }catch (ArrayStoreException | ArrayIndexOutOfBoundsException e){
+                    System.out.println(e.getMessage());
+                }
+            }
+            counter+=step;
+            splittedList.add(frame);
+        }
+
+        return splittedList;
     }
 }
