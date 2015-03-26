@@ -16,9 +16,9 @@ public class DVectorFrame {
     public DVectorFrame(final String[] names) {
         Preconditions.checkNotNull(names);
         this.dVectors = new DVector[names.length];
-        this.vecIndices = new HashMap<String,Integer>();
+        this.vecIndices = new HashMap<String, Integer>();
         int i = 0;
-        for(String n : names)
+        for (String n : names)
             vecIndices.put(n, i++);
     }
 
@@ -53,35 +53,29 @@ public class DVectorFrame {
     }
 
 
-
-    public List<DVectorFrame> split (int numberOfFrames, String[] fields){
+    public List<DVectorFrame> split(int numberOfFrames, String[] fields) {
 
         List<DVectorFrame> splittedList = new ArrayList<DVectorFrame>();
 
         int frameSize = dVectors[0].elements.length;
         int counter = 0;
-        int step;
+        int step = frameSize / numberOfFrames;
 
-        if (frameSize%numberOfFrames == 0)
-            step= frameSize/numberOfFrames;
-        else
-            step= frameSize/numberOfFrames + 1;
-
-        for (int i=0; i<numberOfFrames; i++){
+        for (int i = 0; i < numberOfFrames; i++) {
             DVectorFrame frame = new DVectorFrame(fields);
 
-            for (int j=0; j<frame.dVectors.length; j++){
-                if(frame.dVectors[j] == null){
+            for (int j = 0; j < frame.dVectors.length; j++) {
+                if (frame.dVectors[j] == null) {
                     frame.dVectors[j] = new DVector(step);
                 }
                 try {
-                   System.arraycopy(this.dVectors[j].elements, counter, frame.dVectors[j].elements,0,step);
+                    System.arraycopy(this.dVectors[j].elements, counter, frame.dVectors[j].elements, 0, step);
 
-                }catch (ArrayStoreException | ArrayIndexOutOfBoundsException e){
+                } catch (ArrayStoreException | ArrayIndexOutOfBoundsException e) {
                     System.out.println(e.getMessage());
                 }
             }
-            counter+=step;
+            counter += step;
             splittedList.add(frame);
         }
 
