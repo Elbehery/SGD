@@ -1,5 +1,7 @@
 package de.tuberlin.sgd.core;
 
+import java.math.BigDecimal;
+
 public final class SGD {
 
     // Disallow instantiation.
@@ -26,6 +28,8 @@ public final class SGD {
         /** Evaluate the derivative of the loss function with respect to
          the prediction `p`. */
         public abstract double dloss(double p, double y);
+
+        public abstract BigDecimal dloss(BigDecimal p, BigDecimal y);
     }
 
     /**
@@ -41,6 +45,11 @@ public final class SGD {
         @Override
         public double dloss(double p, double y) {
             return (p - y);
+        }
+
+        @Override
+        public BigDecimal dloss(BigDecimal p, BigDecimal y) {
+            return p.subtract(y);
         }
     }
 
@@ -128,19 +137,19 @@ public final class SGD {
 
                         // Dot product of a sample x and the parameter vector.
                         int m = 1;
-                        double p = params.elements[0];
+                        BigDecimal p = params.elements[0];
                         for (int j : X_indices)
-                            p += frame.getVec(j).elements[i] * params.elements[m++];
+                            p = p.add(frame.getVec(j).elements[i].multiply(params.elements[m++])) ;
 
                         // -- Minimize the loss function --
 
                         // Compute parameter Θ(0).
-                        params.elements[0] = params.elements[0] - alpha * lossFunction.dloss(p, frame.getVec(Y_index).elements[i]);
+                        params.elements[0] = params.elements[0].subtract(BigDecimal.valueOf(alpha).multiply(lossFunction.dloss(p, frame.getVec(Y_index).elements[i]))) ;
 
                         // Compute parameters Θ(1..m).
                         int n = 1;
                         for (int k : X_indices) {
-                            params.elements[n] = params.elements[n] - alpha * lossFunction.dloss(p, frame.getVec(Y_index).elements[i]) * frame.getVec(k).elements[i];
+                            params.elements[n] = params.elements[n].subtract(BigDecimal.valueOf(alpha).multiply(lossFunction.dloss(p, frame.getVec(Y_index).elements[i]).multiply(frame.getVec(k).elements[i])));
                             n++;
                         }
                     }

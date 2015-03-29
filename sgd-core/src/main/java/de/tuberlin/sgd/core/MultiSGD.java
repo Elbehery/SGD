@@ -8,6 +8,7 @@ import com.google.common.primitives.Ints;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 
 public class MultiSGD {
@@ -45,9 +46,22 @@ public class MultiSGD {
 
             executorService.shutdown();
 
+            try{
+                executorService.awaitTermination(1000, TimeUnit.MILLISECONDS);
+            }catch (InterruptedException e){
+
+                System.out.println(e.getMessage());
+            }
+
         }
 
-        for (int y = 0; y < numOfIteration; y++) {
+        System.out.println(params[0].elements[0]);
+        System.out.println(params[0].elements[1]);
+        System.out.println(params[0].elements[2]);
+        System.out.println(params[0].elements[3]);
+        System.out.println(params[0].elements[4]);
+
+    /*    for (int y = 0; y < numOfIteration; y++) {
             System.out.print("Delta of Iteration " + y + " = ");
             double delta = 0;
             for (int h = 0; h < params[y].elements.length - 1; h++) {
@@ -55,7 +69,7 @@ public class MultiSGD {
             }
             System.out.println(delta);
 
-        }
+        }*/
 
     }
 }
