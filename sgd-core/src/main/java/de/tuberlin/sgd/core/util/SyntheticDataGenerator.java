@@ -14,18 +14,24 @@ public class SyntheticDataGenerator {
 
     private static final String NEW_LINE_SEPARATOR = "\n";
 
-    public static double[][] linearFunctionSyntheticGenearator(int row, int col, int seed, double constant) {
+    public static double[][] linearFunctionSyntheticGenearator(int row, int col) {
 
         final double[][] syntheticData = new double[row][col + 1];
-        Random random = new Random(seed);
+        final double[] syntheticParameter = new double[col];
+        Random random = new Random();
+
+        for(int x=0; x<syntheticParameter.length;)
+                syntheticParameter[x++]=random.nextDouble();
+
 
         for (int i = 0; i < row; i++) {
             double label = 0;
             for (int j = 0; j < col; j++) {
                 syntheticData[i][j] = random.nextDouble();
-                label += syntheticData[i][j];
+                System.out.println(syntheticData[i][j]);
+                label += (syntheticData[i][j]*syntheticParameter[j]);
             }
-            syntheticData[i][col] = label + constant + random.nextGaussian();
+            syntheticData[i][col] = label + Math.abs(random.nextGaussian());
         }
         return syntheticData;
     }
@@ -48,7 +54,7 @@ public class SyntheticDataGenerator {
 
     public static void main(String[] args) {
 
-        double[][] data = SyntheticDataGenerator.linearFunctionSyntheticGenearator(10000, 10, 1000, 0.1);
+        double[][] data = SyntheticDataGenerator.linearFunctionSyntheticGenearator(4, 2);
 
         FileWriter fileWriter = null;
 
