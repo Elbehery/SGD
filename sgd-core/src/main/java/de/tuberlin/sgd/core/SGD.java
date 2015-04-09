@@ -1,5 +1,12 @@
 package de.tuberlin.sgd.core;
 
+import com.google.common.collect.ContiguousSet;
+import com.google.common.collect.DiscreteDomain;
+import com.google.common.collect.Range;
+import com.google.common.primitives.Ints;
+
+import java.util.Random;
+
 public final class SGD {
 
     // Disallow instantiation.
@@ -53,10 +60,10 @@ public final class SGD {
         protected ConvexLossFunction lossFunction = new SquaredLossFunction();
 
         /** The initial learning rate. */
-        protected double alpha = 0.005;
+        protected double alpha = 0.001;
 
         /** The number of passes over the training data (aka epochs). */
-        protected int numIterations = 5000;
+        protected int numIterations = 1500000;
 
         /** Fit linear model. */
         public abstract DVector fit(
@@ -114,7 +121,7 @@ public final class SGD {
                 final int[] X_indices,
                 final int Y_index,
                 final ConvexLossFunction lossFunction,
-                final double alpha,
+                double alpha,
                 final int numIterations,
                 final int numSamples) {
 
@@ -129,8 +136,10 @@ public final class SGD {
                         // Dot product of a sample x and the parameter vector.
                         int m = 1;
                         double p = params.elements[0];
-                        for (int j : X_indices)
-                            p += frame.getVec(j).elements[i] * params.elements[m++];
+                        for (int j : X_indices) {
+                            p += frame.getVec(j).elements[i] * params.elements[m];
+                            m++;
+                        }
 
                         // -- Minimize the loss function --
 
@@ -144,6 +153,8 @@ public final class SGD {
                             n++;
                         }
                     }
+                    if(epoch % 100 == 0)
+                        alpha=alpha/2.0;
                 }
 
             } else
@@ -157,18 +168,35 @@ public final class SGD {
 
     public static void main(final String[] args) {
 
-        final DVector params = new DVector(5);
-        final String[] fields = new String[] {"sepal-length", "sepal-width", "petal-length", "petal-width", "label"};
-        final DVectorFrame frame = CSVDataReader.readCSV("ML_Data/iris/iris.data", fields);
+        final DVector params = new DVector(11);
+        Random random = new Random(1000);
+
+        for(int x=0; x<params.elements.length;) {
+            params.elements[x++] = Math.abs(random.nextDouble());
+        }
+
+       // final String[] fields = new String[] {"sepal-length", "sepal-width", "petal-length", "petal-width", "label"};
+        final String[] fields= new String[]{"1","2","3","4","5","6","7","8","9","10","Label"};
+        final DVectorFrame frame = CSVDataReader.readCSV("ML_Data/SynthaticData/Linear/data.data", fields);
 
         final SGDRegressor sgd = new SGDRegressor();
-        sgd.fit(params, frame, new int[]{0, 1, 2, 3}, 4, frame.getVec(0).elements.length);
+        int[] X_indices = Ints.toArray(ContiguousSet.create(Range.closed(0, 9), DiscreteDomain.integers()));
+        //sgd.fit(params, frame, new int[]{0, 1, 2, 3}, 4, frame.getVec(0).elements.length);
 
-        System.out.println(params.elements[0]);
+        sgd.fit(params, frame, X_indices, 10, frame.getVec(0).elements.length);
+
+       // System.out.println(params.elements[0]);
         System.out.println(params.elements[1]);
         System.out.println(params.elements[2]);
         System.out.println(params.elements[3]);
         System.out.println(params.elements[4]);
+        System.out.println(params.elements[5]);
+        System.out.println(params.elements[6]);
+        System.out.println(params.elements[7]);
+        System.out.println(params.elements[8]);
+        System.out.println(params.elements[9]);
+        System.out.println(params.elements[10]);
+
 
 
         /*final DVector params = new DVector(2);

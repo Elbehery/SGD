@@ -28,13 +28,31 @@ public class SyntheticDataGenerator {
             double label = 0;
             for (int j = 0; j < col; j++) {
                 syntheticData[i][j] = random.nextDouble();
-                System.out.println(syntheticData[i][j]);
                 label += (syntheticData[i][j]*syntheticParameter[j]);
             }
             syntheticData[i][col] = label + Math.abs(random.nextGaussian());
         }
+
+
+    try {
+        File file = new File("../SGD/ML_Data/SynthaticData/Linear/parameters.data");
+        if(!file.exists()) {
+            file.createNewFile();
+        }
+        FileWriter fileWriter = new FileWriter(file.getAbsoluteFile());
+        paramtersCSVWriter(syntheticParameter,fileWriter);
+        fileWriter.flush();
+        fileWriter.close();
+    }catch (IOException e){
+        System.out.println(e.getMessage());
+    }
+
         return syntheticData;
     }
+
+
+
+
 
     public static void CSVWriter(double[][] data, FileWriter writer) throws IOException {
 
@@ -52,15 +70,36 @@ public class SyntheticDataGenerator {
     }
 
 
+
+
+
+    public static void paramtersCSVWriter(double[] data, FileWriter writer) throws IOException {
+
+        CSVFormat format = CSVFormat.DEFAULT.withRecordSeparator(NEW_LINE_SEPARATOR);
+        CSVPrinter csvPrinter = new CSVPrinter(writer, format);
+
+        for (int i = 0; i < data.length; i++) {
+            ArrayList<Double> record = new ArrayList<>();
+            record.add(data[i]);
+            csvPrinter.printRecord(record);
+            record=null;
+        }
+    }
+
+
+
+
+
+
     public static void main(String[] args) {
 
-        double[][] data = SyntheticDataGenerator.linearFunctionSyntheticGenearator(4, 2);
+        double[][] data = SyntheticDataGenerator.linearFunctionSyntheticGenearator(10, 10);
 
         FileWriter fileWriter = null;
 
         try {
 
-            File file = new File("../SGD/ML_Data/SynthaticData/Linear/data.csv");
+            File file = new File("../SGD/ML_Data/SynthaticData/Linear/data.data");
             if(!file.exists()) {
                 file.createNewFile();
             }
