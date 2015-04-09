@@ -56,7 +56,7 @@ public final class SGD {
         protected double alpha = 0.005;
 
         /** The number of passes over the training data (aka epochs). */
-        protected int numIterations = 13000;
+        protected int numIterations = 5000;
 
         /** Fit linear model. */
         public abstract DVector fit(
