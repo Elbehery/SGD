@@ -2,7 +2,6 @@ package de.tuberlin.sgd.core.util;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -13,105 +12,193 @@ import java.util.Random;
 public class SyntheticDataGenerator {
 
     private static final String NEW_LINE_SEPARATOR = "\n";
+    private static final Random random = new Random();
 
-    public static double[][] linearFunctionSyntheticGenearator(int row, int col) {
+
+    public static void linearFunctionSyntheticGenerator(int row, int col) throws IOException {
 
         final double[][] syntheticData = new double[row][col + 1];
         final double[] syntheticParameter = new double[col];
-        Random random = new Random();
 
-        for(int x=0; x<syntheticParameter.length;)
-                syntheticParameter[x++]=random.nextDouble();
-
+        for (int x = 0; x < syntheticParameter.length; )
+            syntheticParameter[x++] = random.nextDouble();
 
         for (int i = 0; i < row; i++) {
             double label = 0;
             for (int j = 0; j < col; j++) {
                 syntheticData[i][j] = random.nextDouble();
-                label += (syntheticData[i][j]*syntheticParameter[j]);
+                label += (syntheticData[i][j] * syntheticParameter[j]);
             }
             syntheticData[i][col] = label + Math.abs(random.nextGaussian());
         }
 
+        CSVParametersWriter(syntheticParameter, SyntheticType.LINEAR);
+        CSVDataWriter(syntheticData, SyntheticType.LINEAR);
 
-    try {
-        File file = new File("../SGD/ML_Data/SynthaticData/Linear/parameters.data");
-        if(!file.exists()) {
-            file.createNewFile();
-        }
-        FileWriter fileWriter = new FileWriter(file.getAbsoluteFile());
-        paramtersCSVWriter(syntheticParameter,fileWriter);
-        fileWriter.flush();
-        fileWriter.close();
-    }catch (IOException e){
-        System.out.println(e.getMessage());
-    }
-
-        return syntheticData;
     }
 
 
+    public static void polynomialFunctionSyntheticGenerator(int row, int col) throws IOException{
 
+        final double[][] syntheticData = new double[row][col + 1];
+        final double[] syntheticParameter = new double[col];
 
+        for (int x = 0; x < syntheticParameter.length; )
+            syntheticParameter[x++] = random.nextDouble();
 
-    public static void CSVWriter(double[][] data, FileWriter writer) throws IOException {
+        for (int i = 0; i < row; i++) {
+            double label = 0;
+            double randTmp = ((double) Math.round(random.nextDouble() * 100) / 100);
 
-        CSVFormat format = CSVFormat.DEFAULT.withRecordSeparator(NEW_LINE_SEPARATOR);
-        CSVPrinter csvPrinter = new CSVPrinter(writer, format);
-
-        for (int i = 0; i < data.length; i++) {
-            ArrayList<Double> record = new ArrayList<>();
-            for(double x:data[i]){
-                record.add(x);
+            for (int j = 0; j < col; j++) {
+                syntheticData[i][j] = Math.pow(randTmp, j);
+                label += (syntheticData[i][j] * syntheticParameter[j]);
             }
-            csvPrinter.printRecord(record);
-            record=null;
+            syntheticData[i][col] = label + Math.abs(random.nextGaussian());
+        }
+
+        CSVParametersWriter(syntheticParameter, SyntheticType.POLYNOMIAL);
+        CSVDataWriter(syntheticData, SyntheticType.POLYNOMIAL);
+    }
+
+    public static void sineFunctionSyntheticGenerator(int row, int col) throws IOException{
+
+        final double[][] syntheticData = new double[row][col + 1];
+        final double[] syntheticParameter = new double[col];
+
+        for (int x = 0; x < syntheticParameter.length; )
+            syntheticParameter[x++] = random.nextDouble();
+
+        for (int i = 0; i < row; i++) {
+            double label = 0;
+
+            for (int j = 0; j < col; j++) {
+                syntheticData[i][j] = random.nextDouble();
+                label += (syntheticData[i][j] * syntheticParameter[j]);
+            }
+            syntheticData[i][col] = label + Math.abs(random.nextGaussian());
+        }
+
+        CSVParametersWriter(syntheticParameter, SyntheticType.POLYNOMIAL);
+        CSVDataWriter(syntheticData, SyntheticType.POLYNOMIAL);
+    }
+
+
+
+    public static void CSVDataWriter(double[][] data, SyntheticType type) throws IOException {
+
+        File file = null;
+        FileWriter fileWriter = null;
+
+        switch (type) {
+            case LINEAR:
+                file = new File("../SGD/ML_Data/SyntheticData/linear/data.data");
+                if (file.getParentFile().exists())
+                    file.createNewFile();
+                else {
+                    file.getParentFile().mkdir();
+                    file.createNewFile();
+                }
+                break;
+            case POLYNOMIAL:
+                file = new File("../SGD/ML_Data/SyntheticData/polynomial/data.data");
+                if (file.getParentFile().exists())
+                    file.createNewFile();
+                else {
+                    file.getParentFile().mkdir();
+                    file.createNewFile();
+                }
+                break;
+            default:
+                break;
+        }
+
+        try {
+
+            fileWriter = new FileWriter(file);
+            CSVFormat format = CSVFormat.DEFAULT.withRecordSeparator(NEW_LINE_SEPARATOR);
+            CSVPrinter csvPrinter = new CSVPrinter(fileWriter, format);
+
+            for (int i = 0; i < data.length; i++) {
+                ArrayList<Double> record = new ArrayList<>();
+                for (double x : data[i]) {
+                    record.add(x);
+                }
+                csvPrinter.printRecord(record);
+                record = null;
+            }
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        } finally {
+            fileWriter.flush();
+            fileWriter.close();
         }
     }
 
 
 
+    public static void CSVParametersWriter(double[] data, SyntheticType type) throws IOException {
 
+        File file = null;
+        FileWriter fileWriter = null;
 
-    public static void paramtersCSVWriter(double[] data, FileWriter writer) throws IOException {
+        switch (type) {
+            case LINEAR:
+                file = new File("../SGD/ML_Data/SyntheticData/linear/parameters.data");
+                if (file.getParentFile().exists())
+                    file.createNewFile();
+                else {
+                    file.getParentFile().mkdir();
+                    file.createNewFile();
+                }
+                break;
+            case POLYNOMIAL:
+                file = new File("../SGD/ML_Data/SyntheticData/polynomial/parameters.data");
+                if (file.getParentFile().exists())
+                    file.createNewFile();
+                else {
+                    file.getParentFile().mkdir();
+                    file.createNewFile();
+                }
+                break;
+            default:
+                break;
+        }
 
-        CSVFormat format = CSVFormat.DEFAULT.withRecordSeparator(NEW_LINE_SEPARATOR);
-        CSVPrinter csvPrinter = new CSVPrinter(writer, format);
+        try {
+            fileWriter = new FileWriter(file);
+            CSVFormat format = CSVFormat.DEFAULT.withRecordSeparator(NEW_LINE_SEPARATOR);
+            CSVPrinter csvPrinter = new CSVPrinter(fileWriter, format);
 
-        for (int i = 0; i < data.length; i++) {
-            ArrayList<Double> record = new ArrayList<>();
-            record.add(data[i]);
-            csvPrinter.printRecord(record);
-            record=null;
+            for (int i = 0; i < data.length; i++) {
+                ArrayList<Double> record = new ArrayList<>();
+                record.add(data[i]);
+                csvPrinter.printRecord(record);
+                record = null;
+            }
+
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        } finally {
+            fileWriter.flush();
+            fileWriter.close();
         }
     }
 
 
-
-
+    public enum SyntheticType{
+        LINEAR,POLYNOMIAL,SIN;
+    }
 
 
     public static void main(String[] args) {
 
-        double[][] data = SyntheticDataGenerator.linearFunctionSyntheticGenearator(10, 10);
-
-        FileWriter fileWriter = null;
-
         try {
-
-            File file = new File("../SGD/ML_Data/SynthaticData/Linear/data.data");
-            if(!file.exists()) {
-                file.createNewFile();
-            }
-            fileWriter = new FileWriter(file.getAbsoluteFile());
-
-            SyntheticDataGenerator.CSVWriter(data, fileWriter);
-            fileWriter.flush();
-            fileWriter.close();
-
+            SyntheticDataGenerator.polynomialFunctionSyntheticGenerator(10, 10);
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
+
 
     }
 }
